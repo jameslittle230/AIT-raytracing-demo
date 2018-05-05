@@ -44,20 +44,26 @@ Shader.source[document.currentScript.src.split('js/shaders/')[1]] = `
 
     bool findBestHit(vec4 e, vec4 d,
     out float bestT, out vec4 bestBrdf, out mat4 bestA) {
-        bestT = -1.0;
+        bestA = quadrics[1];
+        bestBrdf = brdfs[1];
+        // bestT = 5.0;
+        // return true;
+        bestT = 9000.0;
 
         for(int i=0; i<16; i++) {
             float currentT = intersectClippedQuadric(quadrics[i*2], quadrics[i*2+1], e, d);
-            if(currentT > bestT) {
+
+            if(currentT < bestT && currentT > 0.0) {
                 bestT = currentT;
                 bestBrdf = brdfs[i];
                 bestA = quadrics[i*2];
             }
         }
 
-        if(bestT > -1.0) {
+        if(bestT < 9000.0) {
             return true;
         }
+        return false;
     }
 
     void main(void) {
@@ -74,14 +80,13 @@ Shader.source[document.currentScript.src.split('js/shaders/')[1]] = `
         } else {
             vec4 hitPoint = e + d*t;
             vec3 normal = normalize((hitPoint * a + a * hitPoint).xyz);
-            vec4 color = vec4(0, 0, 0, 1);
-            for(int i=0; i<8; i++) {
-                if(dot(vec4(normal, 1), lightPositions[i]) < 0.0) {
-                    continue;
-                }
-
-                color += lightPowerDensities[i] * brdf * dot(vec4(normal, 1), lightPositions[i]);
+            vec4 color = brdf;
+            if(dot(normal, vec3(0, 0, 1)) < 0.0) {
+                color -= vec4(0.3, 0.3, 0.3, 0);
             }
+            // for(int i=0; i<8; i++) {
+            //     color += brdf * dot(vec4(normal, 1), lightPositions[i]);
+            // }
             gl_FragColor = vec4(color.rgb, 1);
         }
     }
