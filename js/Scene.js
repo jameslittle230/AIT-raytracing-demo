@@ -30,6 +30,7 @@ const Scene = function(gl) {
         var sphere = new ClippedQuadric(Material.quadrics.at(2), Material.quadrics.at(3), Material.brdfs.at(1));
         var dune = new ClippedQuadric(Material.quadrics.at(4), Material.quadrics.at(5), Material.brdfs.at(2));
         var lightviz = new ClippedQuadric(Material.quadrics.at(6), Material.quadrics.at(7), Material.brdfs.at(3));
+        var ocean = new ClippedQuadric(Material.quadrics.at(8), Material.quadrics.at(9), Material.brdfs.at(4));
 
         dune.surfaceCoeffMatrix.set(
           -0.05, 0, 0, 0,
@@ -41,20 +42,31 @@ const Scene = function(gl) {
           0, 0, 0, 1,
           0, 0, 0, 0,
           0, 0, 0, -1);
-        // dune.transform(new Mat4().set().translate(0, -5, 0));
+
+        ocean.surfaceCoeffMatrix.set(
+          0, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 0, 0,
+          0, 0, 0, -15
+        );
+
+        ocean.clipperCoeffMatrix.set(
+          0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, -1
+        );
 
         sphere
           .setUnitSphere()
           .transformClipper(new Mat4().set().translate(0, 1.3, 0))
           .transform(new Mat4().set().scale(3, 1, 3).translate(0, 1, 0));
 
-        cylinder.setUnitCylinder().transform(new Mat4().set().scale(0.1, 2, 0.1));
+        cylinder.setUnitCylinder().transform(new Mat4().set().scale(0.1, 3, 0.1));
 
 
-        dune.brdf.set(0.9, 0.9, 0.2, 0);
-        sphere.brdf.set(1, 0.5, 0.5, 0);
+        dune.brdf.set(0.8, 0.8, 0.2, 0);
+        sphere.brdf.set(0.9, 0.1, 0.1, 0);
         cylinder.brdf.set(0.3, 0.3, 0.3, 0);
-        lightviz.brdf.set(1, 1, 1, 0);
+        lightviz.brdf.set(0.3, 0.3, 0.3, 0);
+        ocean.brdf.set(0, 0, 0.4, 0);
 
         Material.lightPositions.at(0).set(-1, 0.5, 3, 0);
         lightviz.setUnitSphere().transform(new Mat4().set().translate(-1, 0.5, 3));
