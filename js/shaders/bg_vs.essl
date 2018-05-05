@@ -1,0 +1,18 @@
+Shader.source[document.currentScript.src.split('js/shaders/')[1]] = `
+	attribute vec3 vertexPosition;
+	attribute vec3 vertexNormal;
+	attribute vec2 vertexTexCoord;
+
+	uniform mat4 rayDirMatrix;
+
+	varying vec2 texCoord;
+	varying vec4 worldPos;
+	varying vec3 worldNormal;
+	varying vec3 rayDir;
+	varying vec3 eyePos;
+
+	void main(void) {
+		gl_Position = vec4(vertexPosition.xy, 0.99999, 1);
+		rayDir = (vec4(vertexPosition, 1.0) * rayDirMatrix).xyz;
+	}
+`;

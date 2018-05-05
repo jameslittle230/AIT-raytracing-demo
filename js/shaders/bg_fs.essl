@@ -1,0 +1,88 @@
+Shader.source[document.currentScript.src.split('js/shaders/')[1]] = `
+    precision highp float;
+
+    varying vec3 rayDir;
+
+    uniform vec3 eyePos;
+    uniform samplerCube envmapTexture;
+
+    uniform mat4 quadrics[32];
+    uniform vec4 brdfs[16];
+    uniform vec4 lightPositions[8];
+    uniform vec4 lightPowerDensities[8];
+
+    float intersectClippedQuadric(mat4 A, mat4 B, vec4 e, vec4 d) {
+        float a = dot(d * A, d);
+        float b = dot(d * A, e) + dot(e * A, d);
+        float c = dot(e * A, e);
+
+        float disc = b*b-4.0*a*c;
+
+        if(disc < 0.0) {
+            return -1.0;
+        }
+
+        float t1 = (-1.0*b + sqrt(disc))/(2.0*a);
+        float t2 = (-1.0*b - sqrt(disc))/(2.0*a);
+
+        vec4 r1 = e + d * t1;
+        vec4 r2 = e + d * t2;
+
+        if(dot(r1 * B, r1) > 0.0) {
+            t1 = -1.0;
+        }
+
+        if(dot(r2 * B, r2) > 0.0) {
+            t2 = -1.0;
+        }
+
+        if(t1 > 0.0 && t1 < t2) return t1;
+        if(t2 > 0.0 && t2 < t1) return t2;
+        if(t1 > 0.0) return t1;
+        return t2;
+    }
+
+    bool findBestHit(vec4 e, vec4 d,
+    out float bestT, out vec4 bestBrdf, out mat4 bestA) {
+        bestT = -1.0;
+
+        for(int i=0; i<16; i++) {
+            float currentT = intersectClippedQuadric(quadrics[i*2], quadrics[i*2+1], e, d);
+            if(currentT > bestT) {
+                bestT = currentT;
+                bestBrdf = brdfs[i];
+                bestA = quadrics[i*2];
+            }
+        }
+
+        if(bestT > -1.0) {
+            return true;
+        }
+    }
+
+    void main(void) {
+        vec4 e = vec4(eyePos, 1);
+        vec4 d = vec4(normalize(rayDir), 0);
+
+        float t;
+        vec4 brdf;
+        mat4 a;
+        bool hitFound = findBestHit(e, d, t, brdf, a);
+
+        if(!hitFound) {
+            gl_FragColor = textureCube(envmapTexture, rayDir);
+        } else {
+            vec4 hitPoint = e + d*t;
+            vec3 normal = normalize((hitPoint * a + a * hitPoint).xyz);
+            vec4 color = vec4(0, 0, 0, 1);
+            for(int i=0; i<8; i++) {
+                if(dot(vec4(normal, 1), lightPositions[i]) < 0.0) {
+                    continue;
+                }
+
+                color += lightPowerDensities[i] * brdf * dot(vec4(normal, 1), lightPositions[i]);
+            }
+            gl_FragColor = vec4(color.rgb, 1);
+        }
+    }
+`;
