@@ -39,6 +39,11 @@ const Scene = function(gl) {
 
   this.beachball = new ClippedQuadric(Material.quadrics.at(18), Material.quadrics.at(19), Material.brdfs.at(9));
 
+  var palmtree1 = new ClippedQuadric(Material.quadrics.at(20), Material.quadrics.at(21), Material.brdfs.at(10));
+  var palmtree2 = new ClippedQuadric(Material.quadrics.at(22), Material.quadrics.at(23), Material.brdfs.at(11));
+  var palmtree3 = new ClippedQuadric(Material.quadrics.at(24), Material.quadrics.at(25), Material.brdfs.at(12));
+  var palmtree4 = new ClippedQuadric(Material.quadrics.at(26), Material.quadrics.at(27), Material.brdfs.at(13));
+
   cylinder.setUnitCylinder().transform(new Mat4().set().scale(0.1, 3, 0.1).rotate(0.5, 0, 0, 1));
 
   sphere
@@ -109,13 +114,70 @@ const Scene = function(gl) {
   
   this.beachball.setUnitSphere().transform(new Mat4().set().translate(4, 5*Math.sin(2*Math.PI * this.frameCount)-2.1, 4));
 
+  palmtree1.surfaceCoeffMatrix.set(
+    1, 0, 0, 0,
+    0, -1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 0
+  );
+
+  palmtree1.clipperCoeffMatrix.set(
+    0, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, -1);
+  
+  palmtree1
+    .transformClipper(new Mat4().set().scale(1, 0.5, 1).translate(0, -0.5, 0))
+    .transform(new Mat4().set().scale(0.6, 5.1, 0.6).translate(-3.5, -0.1, 6));
+  
+  palmtree2.setUnitSphere();
+
+  palmtree2.clipperCoeffMatrix.set(
+    1/5, 0, 0, 0,
+    0, -1/5, 0, 0,
+    0, 0, 2, 0,
+    0, 0, 0, -1
+  );
+
+  palmtree2
+    .transformClipper(new Mat4().set().scale(0.8, 0.5, 0.8).rotate(0.4, 0, 0, 1).translate(2, 0, 0))
+    .transform(new Mat4().set().translate(-3.0, -0.9, 6));
+
+  
+  palmtree3.setUnitSphere();
+
+  palmtree3.clipperCoeffMatrix.set(
+    1/5, 0, 0, 0,
+    0, -1/5, 0, 0,
+    0, 0, 2, 0,
+    0, 0, 0, -1
+  );
+
+  palmtree3
+    .transformClipper(new Mat4().set().scale(0.8, 0.5, 0.8).rotate(0.4, 0, 0, 1).translate(2, 0, 0))
+    .transform(new Mat4().set().rotate(4.188790205, 0, 1, 0).translate(-3.3, -0.9, 6.5));
+  
+  palmtree4.setUnitSphere();
+
+  palmtree4.clipperCoeffMatrix.set(
+    1/5, 0, 0, 0,
+    0, -1/5, 0, 0,
+    0, 0, 2, 0,
+    0, 0, 0, -1
+  );
+
+  palmtree4
+    .transformClipper(new Mat4().set().scale(0.8, 0.8, 0.8).rotate(0.4, 0, 0, 1).translate(2, 0, 0))
+    .transform(new Mat4().set().rotate(2.094395102, 0, 1, 0).translate(-3.3, -0.9, 6));
+
   lightviz.setUnitSphere().transform(new Mat4().set().scale(0.1, 0.1, 0.1).translate(-0.2, 3, -10));
 
   dune.brdf.set(0.8, 0.8, 0.3, 0);
-  sphere.brdf.set(0.5, 0.5, 0.5, 250);
+  sphere.brdf.set(0.7, 0.7, 0.4, 0);
   cylinder.brdf.set(0.5, 0.5, 0.5, 0);
   lightviz.brdf.set(1, 1, 1, 0);
-  ocean.brdf.set(0.3, 0.3, 1, 0);
+  ocean.brdf.set(0, 0, 0.5, 250);
   
   castle1.brdf.set(0.8, 0.8, 0.3, 0);
   castle2.brdf.set(0.8, 0.8, 0.3, 0);
@@ -123,6 +185,11 @@ const Scene = function(gl) {
   castle4.brdf.set(0.8, 0.8, 0.3, 0);
 
   this.beachball.brdf.set(0.99, 0.99, 0.99, 0);
+
+  palmtree1.brdf.set(0.4, 0.4, 0.2, 0);
+  palmtree2.brdf.set(0.1, 0.7, 0.1, 3);
+  palmtree3.brdf.set(0.1, 0.7, 0.1, 3);
+  palmtree4.brdf.set(0.1, 0.7, 0.1, 3);
 
   Material.lightPositions.at(0).set(-3, 5, 10, 1);
   Material.lightPositions.at(1).set(5, 2, 5, 1);
@@ -160,6 +227,7 @@ Scene.prototype.update = function(gl, keysPressed) {
   console.log(bbycoord)
 
   this.beachball.setUnitSphere().transform(new Mat4().set().translate(4, bbycoord, 4));
+  Material.lightPositions.at(2).set(8*Math.sin(this.frameCount/70), 3, -10, 1);
 
   this.camera.move(dt, keysPressed);
   Material.lightPositions.at(7).set(this.camera.position);

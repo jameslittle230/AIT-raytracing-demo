@@ -1,0 +1,12 @@
+Features implemented:
+
+1. Beach
+2. Parasol
+3. Ocean
+4. Sky
+5. Shadows
+6. Disco (there are red, green, and blue shaded lights illuminating the scene from different sides)
+7. Sand castle
+8. Beach ball
+9. Animation (the beach ball and one of the lights is moving)
+10. Palm tree
