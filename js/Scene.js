@@ -32,6 +32,13 @@ const Scene = function(gl) {
   var lightviz = new ClippedQuadric(Material.quadrics.at(6), Material.quadrics.at(7), Material.brdfs.at(3));
   var ocean = new ClippedQuadric(Material.quadrics.at(8), Material.quadrics.at(9), Material.brdfs.at(4));
 
+  var castle1 = new ClippedQuadric(Material.quadrics.at(10), Material.quadrics.at(11), Material.brdfs.at(5));
+  var castle2 = new ClippedQuadric(Material.quadrics.at(12), Material.quadrics.at(13), Material.brdfs.at(6));
+  var castle3 = new ClippedQuadric(Material.quadrics.at(14), Material.quadrics.at(15), Material.brdfs.at(7));
+  var castle4 = new ClippedQuadric(Material.quadrics.at(16), Material.quadrics.at(17), Material.brdfs.at(8));
+
+  this.beachball = new ClippedQuadric(Material.quadrics.at(18), Material.quadrics.at(19), Material.brdfs.at(9));
+
   cylinder.setUnitCylinder().transform(new Mat4().set().scale(0.1, 3, 0.1).rotate(0.5, 0, 0, 1));
 
   sphere
@@ -60,21 +67,70 @@ const Scene = function(gl) {
     0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, -1
   );
 
+  castle1.setUnitCylinder()
+    .transform(new Mat4().set().scale(0.7, 1.2, 0.7).translate(1, -2, 3));
+  
+  castle2.surfaceCoeffMatrix.set(
+    1, 0, 0, 0,
+    0, -1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 0
+  );
+
+  castle2.clipperCoeffMatrix.set(
+    0, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, -1);
+  
+  castle2
+    .transformClipper(new Mat4().set().scale(1, 0.5, 1).translate(0, -0.5, 0))
+    .transform(new Mat4().set().scale(0.7, 0.7, 0.7).translate(1, -0.1, 3));
+  
+  castle3.setUnitCylinder()
+    .transform(new Mat4().set().scale(0.7, 1.2, 0.7).translate(-1, -2, 3));
+
+  castle4.surfaceCoeffMatrix.set(
+    1, 0, 0, 0,
+    0, -1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 0
+  );
+
+  castle4.clipperCoeffMatrix.set(
+    0, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, -1);
+  
+  castle4
+    .transformClipper(new Mat4().set().scale(1, 0.5, 1).translate(0, -0.5, 0))
+    .transform(new Mat4().set().scale(0.7, 0.7, 0.7).translate(-1, -0.1, 3));
+  
+  this.beachball.setUnitSphere().transform(new Mat4().set().translate(4, 5*Math.sin(2*Math.PI * this.frameCount)-2.1, 4));
+
   lightviz.setUnitSphere().transform(new Mat4().set().scale(0.1, 0.1, 0.1).translate(-0.2, 3, -10));
 
-  dune.brdf.set(0.8, 0.8, 0.8, 0);
+  dune.brdf.set(0.8, 0.8, 0.3, 0);
   sphere.brdf.set(0.5, 0.5, 0.5, 250);
   cylinder.brdf.set(0.5, 0.5, 0.5, 0);
   lightviz.brdf.set(1, 1, 1, 0);
-  ocean.brdf.set(0, 0, 1, 0);
+  ocean.brdf.set(0.3, 0.3, 1, 0);
+  
+  castle1.brdf.set(0.8, 0.8, 0.3, 0);
+  castle2.brdf.set(0.8, 0.8, 0.3, 0);
+  castle3.brdf.set(0.8, 0.8, 0.3, 0);
+  castle4.brdf.set(0.8, 0.8, 0.3, 0);
+
+  this.beachball.brdf.set(0.99, 0.99, 0.99, 0);
 
   Material.lightPositions.at(0).set(-3, 5, 10, 1);
   Material.lightPositions.at(1).set(5, 2, 5, 1);
   Material.lightPositions.at(2).set(8, 3, -10, 1);
 
-  Material.lightPowerDensities.at(0).set(0, 1, 0, 1);
-  Material.lightPowerDensities.at(1).set(1, 0, 0, 1);
-  Material.lightPowerDensities.at(2).set(0, 0, 1, 1);
+  Material.lightPowerDensities.at(0).set(0.4, 0.6, 0.4, 1);
+  Material.lightPowerDensities.at(1).set(0.6, 0.4, 0.4, 1);
+  Material.lightPowerDensities.at(2).set(0.4, 0.4, 0.6, 1);
   Material.lightPowerDensities.at(7).set(0.3, 0.3, 0.3, 1); // camera light
 };
 
@@ -99,6 +155,11 @@ Scene.prototype.update = function(gl, keysPressed) {
 
   Material.eyePos.set(this.camera.position);
   Material.rayDirMatrix.set(this.camera.rayDirMatrix);
+
+  let bbycoord = Math.abs(5*Math.sin((2*Math.PI * this.frameCount)/90))-2.1;
+  console.log(bbycoord)
+
+  this.beachball.setUnitSphere().transform(new Mat4().set().translate(4, bbycoord, 4));
 
   this.camera.move(dt, keysPressed);
   Material.lightPositions.at(7).set(this.camera.position);

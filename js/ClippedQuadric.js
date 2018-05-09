@@ -42,8 +42,6 @@ ClippedQuadric.prototype.transform = function (matrix) {
 
 ClippedQuadric.prototype.transformClipper = function (matrix) {
   matrix.invert();
-  console.log(this.clipperCoeffMatrix.storage);
   this.clipperCoeffMatrix.premul(matrix).mul(matrix.transpose());
-  console.log(this.clipperCoeffMatrix.storage);
   return this;
 }
